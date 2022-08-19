@@ -1,9 +1,7 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
-
-import '../data/model/photo.dart';
-import '../data/repository/photo_repository.dart';
+import 'package:mvvm_guide/domain/repository/photo_repository.dart';
+import 'package:mvvm_guide/ui/main_action.dart';
+import 'package:mvvm_guide/ui/main_state.dart';
 
 class MainViewModel extends ChangeNotifier {
   // 데이터 저장소
@@ -12,21 +10,25 @@ class MainViewModel extends ChangeNotifier {
   MainViewModel({required PhotoRepository repository})
       : _repository = repository;
 
-  // 데이터
-  List<Photo> _images = [];
+  MainState _state = const MainState();
 
-  List<Photo> get images => UnmodifiableListView(_images); // 로딩
+  MainState get state => _state;
 
-  bool _isLoading = false;
+  void onAction(MainAction action) {
+    action.when(
+      fetchImages: _fetchImages,
+    );
+  }
 
-  bool get isLoading => _isLoading;
-
-  Future<void> fetchImages(String query) async {
-    _isLoading = true;
+  Future<void> _fetchImages(String query) async {
+    _state = state.copyWith(isLoading: true);
     notifyListeners();
 
-    _images = await _repository.getImages(query);
-    _isLoading = false;
+    final images = await _repository.getImages(query);
+    _state = state.copyWith(
+      images: images,
+      isLoading: false,
+    );
     notifyListeners();
   }
 }

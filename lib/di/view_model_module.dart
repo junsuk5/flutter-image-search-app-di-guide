@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 
-import '../data/repository/photo_repository.dart';
+import '../data/repository/photo_repository_impl.dart';
 import '../ui/main_view_model.dart';
 import 'di_setup.dart';
 
@@ -8,5 +8,5 @@ import 'di_setup.dart';
 abstract class ViewModelModule {
   @injectable
   MainViewModel get mainViewModel =>
-      MainViewModel(repository: getIt<PhotoRepository>());
+      MainViewModel(repository: getIt<PhotoRepositoryImpl>());
 }

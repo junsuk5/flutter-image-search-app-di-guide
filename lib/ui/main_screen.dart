@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mvvm_guide/domain/model/photo.dart';
+import 'package:mvvm_guide/ui/main_action.dart';
 import 'package:provider/provider.dart';
 
-import '../data/model/photo.dart';
 import '../di/di_setup.dart';
 import 'main_view_model.dart';
 
@@ -24,10 +25,12 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => getIt<MainViewModel>()..fetchImages(''),
+      create: (_) =>
+          getIt<MainViewModel>()..onAction(const MainAction.fetchImages('')),
       builder: (context, _) {
         final viewModel = context.watch<MainViewModel>();
         final orientation = MediaQuery.of(context).orientation;
+        final state = viewModel.state;
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -52,7 +55,8 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     suffixIcon: GestureDetector(
                       onTap: () {
-                        viewModel.fetchImages(_controller.text);
+                        viewModel
+                            .onAction(MainAction.fetchImages(_controller.text));
                       },
                       child: const Icon(Icons.search),
                     ),
@@ -68,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: viewModel.isLoading
+                  child: state.isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : GridView(
                           gridDelegate:
@@ -78,7 +82,7 @@ class _MainScreenState extends State<MainScreen> {
                             mainAxisSpacing: 10,
                             crossAxisSpacing: 10,
                           ),
-                          children: viewModel.images.map((Photo image) {
+                          children: state.images.map((Photo image) {
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: Image.network(
